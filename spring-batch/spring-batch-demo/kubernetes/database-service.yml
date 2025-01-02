@@ -1,0 +1,29 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgresdb
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: postgresdb
+subsets:
+  - addresses:
+      - ip: 192.168.86.20 #my local ip found from sys-preference> network https://www.whatismybrowser.com/detect/what-is-my-local-ip-address
+    ports:
+      - port: 5432
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  # base64 of "root" ($>echo -n "postgres" | base64)
+  db.username: cG9zdGdyZXM=
+  db.password: cG9zdGdyZXM=

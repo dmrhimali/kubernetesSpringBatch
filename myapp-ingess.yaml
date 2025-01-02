@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: simple-fanout-example
+  annotations: 
+      nginx.ingresskubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: myapp.com
+    http: #http forwarding to internal service
+      paths:
+      - path: /analytics
+        backend: #service backend 
+          serviceName: analytics-service
+          servicePort: 3000 #sbhould match service/kubernetes-dashboard PROT when execute kubectl get all -n kubernetes-dashboard
+      - path: /shopping
+        backend: #service backend 
+          serviceName: shopping-service
+          servicePort: 8080 #sbhould match service/kubernetes-dashboard PROT when execute kubectl get all -n kubernetes-dashboard
+      

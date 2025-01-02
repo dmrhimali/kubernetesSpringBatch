@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo 
+        ports:
+        - containerPort: 27017 #lookup mongo in dockerhub if you do not know  (https://hub.docker.com/_/mongo)
+        env: #lookup mongo in dockerhub if you do not know (https://hub.docker.com/_/mongo Environment Variables    )
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef: 
+              name: mongodb-secret #metadata:name in mongo-secret.yml 
+              key: mongo-root-username #data:mongo-root-username key in mongo-secret.yml
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef: 
+              name: mongodb-secret #metadata:name in mongo-secret.yml 
+              key: mongo-root-password #data:mongo-root-password key in mongo-secret.yml    
+
+#note 3 dashes to seperate service document from deployment document:
+---
+apiVersion: v1
+kind: Service 
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb  #should match template:metadata:label in mongodb deployment configuration to connect to pod
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017 #should match containerPort in mongodb deployment configuration 

@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bootiful-spring-boot-job-$JOB_NAME
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bootiful-job
+          image: spring-batch-demo:0.0.1-SNAPSHOT
+          imagePullPolicy: Never
+          env:
+            #spring.batch.job.enabled: false
+            - name: SPRING_BATCH_JOB_ENABLED
+              value: "true"
+            #spring.datasource.url=jdbc:postgresql://postgresdb:5432/postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgresdb:5432/postgres
+            #spring.datasource.username=postgres
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: db.username
+            #spring.datasource.password=postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: db.password
+            #spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_JPA_DATABASE-PLATFORM
+              value: org.hibernate.dialect.PostgreSQLDialect
+            #spring.jpa.show-sql=org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_JPA_SHOW-SQL
+              value: "false"
+            #spring.elasticsearch.rest.uris: elastic:9200
+            - name: SPRING_ELASTICSEARCH_REST_URIS
+              value: elastic:9200
+            #spring.elasticsearch.rest.username:
+            - name: SPRING_ELASTICSEARCH_REST_USERNAME
+              value:
+            #spring.elasticsearch.rest.password:
+            - name: SPRING_ELASTICSEARCH_REST_PASSWORD
+              value:
+            # eshost
+            - name: ESHOST
+              value: elasticsearch

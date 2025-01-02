@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+
+spring:
+  batch:
+    job:
+      enabled: false #disable auto/default job launcher, we want batch job runnig when /load endpoint is called instead.
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres #replace localhost with postgresdb for docker service postgresdb in docker-compose.yml
+    username: postgres
+    password: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+  elasticsearch:
+    rest:
+      uris: localhost:9200  #replace localhost with postgresdb for docker service elastic_spring_batch in docker-compose.yml
+      username:
+      password:
+  #application-name (to be referenced in configmaps etc)
+  application.name: spring-batch-demo-service
+  #enable reload map when a configmap changes
+  cloud.kubernetes.reload.enabled: true
+
+eshost: localhost
+

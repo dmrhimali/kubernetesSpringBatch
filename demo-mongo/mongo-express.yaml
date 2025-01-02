@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express 
+        ports:
+        - containerPort: 8081  #lookup mongo-express in dockerhub for port/env vars etc(https://hub.docker.com/_/mongo-express)
+        env: 
+        - name: ME_CONFIG_MONGODB_SERVER
+          valueFrom: #instead of harcoding value, we put it in a configmap and reference (so other components can also use it )
+            configMapKeyRef: 
+              name: mongodb-configmap #metadata:name in mongo-configmap.yml 
+              key: database_url #data:database_url key in mongo-cpnfigmap.yml
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME #same ones we setup for mogodb earlier
+          valueFrom:
+            secretKeyRef: 
+              name: mongodb-secret #metadata:name in mongo-secret.yml 
+              key: mongo-root-username #data:mongo-root-username key in mongo-secret.yml
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD #same ones we setup for mogodb earlier
+          valueFrom:
+            secretKeyRef: 
+              name: mongodb-secret #metadata:name in mongo-secret.yml 
+              key: mongo-root-password #data:mongo-root-password key in mongo-secret.yml   
+
+#note 3 dashes to seperate service document from deployment document:
+---
+apiVersion: v1
+kind: Service 
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express  #should match template:metadata:label in  deployment configuration to connect to pod
+  type: LoadBalancer #Mark as an external service (confusing because internal service also loadbalancess)
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081 #should match containerPort in  deployment configuration 
+      nodePort: 30000 #Mark as external service (>=30000). External web will acess using this port

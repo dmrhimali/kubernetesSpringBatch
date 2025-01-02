@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  postgresdb:
+    image: postgres:10.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres #will be in default db postgres
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
+    environment:
+      discovery.type: single-node
+    restart: "no"
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    expose:
+      - '9200'
+      - '9300'
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:6.5.1
+    ports:
+      - "5601:5601"
+    expose:
+      - "5601"
+
+networks:
+  default:

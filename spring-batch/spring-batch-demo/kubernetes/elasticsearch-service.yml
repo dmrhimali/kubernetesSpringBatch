@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: elasticsearch
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9200
+      targetPort: 9200
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: elasticsearch
+subsets:
+  - addresses:
+      - ip: 192.168.86.20 #my local ip found from sys-preference> network https://www.whatismybrowser.com/detect/what-is-my-local-ip-address
+    ports:
+      - port: 9200

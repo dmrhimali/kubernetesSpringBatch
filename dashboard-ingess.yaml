@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+spec:
+  rules:
+  - host: dashboard.com
+    http: #http forwarding to internal service
+      paths:
+      - backend: #service backend 
+          serviceName: kubernetes-dashboard
+          servicePort: 80 #sbhould match service/kubernetes-dashboard PROT when execute kubectl get all -n kubernetes-dashboard
